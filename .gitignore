@@ -9,4 +9,5 @@
 **/SVDMx.Rcheck
 **/SVDMx_0.1.0
 .Rproj.user
-
+.gitattributes
+.gitignore
