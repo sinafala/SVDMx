@@ -41,10 +41,10 @@ qx("female",0.05,modsv=2022)
 qx("male",0.03,am=0.26)
 qx("male",0.03,TRUE,TRUE,TRUE,0.26)
 qx("male",c(0.03,0.01))
-\dontrun{qx("male",c(0.03,0.01),am=0.3)}
+\donttest{qx("male",c(0.03,0.01),am=0.3)}
 }
 \references{
-\doi{doi:10.48550/arXiv.1612.01408} and \doi{doi:10.1007/s13524-019-00785-3}
+Clark (2016) \doi{doi:10.48550/arXiv.1612.01408} and Clark (2019) \doi{doi:10.1007/s13524-019-00785-3}
 }
 \author{
 Samuel J. Clark, \email{work@samclark.net}

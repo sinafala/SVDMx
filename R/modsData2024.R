@@ -43,7 +43,7 @@
 #'       }
 #'     }
 #' }
-#' @source See model development in \doi{doi:10.48550/arXiv.1612.01408} and \doi{doi:10.1007/s13524-019-00785-3}
+#' @source See model development in Clark (2016) \doi{doi:10.48550/arXiv.1612.01408} and Clark (2019) \doi{doi:10.1007/s13524-019-00785-3}
 "mods2024"
 
 # load the model data: svd components and regression coefficients

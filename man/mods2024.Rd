@@ -38,7 +38,7 @@ An R list object with members:
 }
 }
 \source{
-See model development in \doi{doi:10.48550/arXiv.1612.01408} and \doi{doi:10.1007/s13524-019-00785-3}
+See model development in Clark (2016) \doi{doi:10.48550/arXiv.1612.01408} and Clark (2019) \doi{doi:10.1007/s13524-019-00785-3}
 }
 \usage{
 mods2024

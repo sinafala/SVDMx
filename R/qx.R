@@ -2,7 +2,7 @@
 #'
 #' @description Generate single-year 1qx or 5-year 5qx age-specific probabilities of dying using the SVD-Comp mortality model indexed by child mortality, 5q0, or child and adult mortality, 5q0 and 45q15.
 #' @author Samuel J. Clark, \email{work@samclark.net}
-#' @references \doi{doi:10.48550/arXiv.1612.01408} and \doi{doi:10.1007/s13524-019-00785-3}
+#' @references Clark (2016) \doi{doi:10.48550/arXiv.1612.01408} and Clark (2019) \doi{doi:10.1007/s13524-019-00785-3}
 
 #'
 #' @param sex Character: 'female' or 'male'.
@@ -19,7 +19,7 @@
 #' qx("male",0.03,am=0.26)
 #' qx("male",0.03,TRUE,TRUE,TRUE,0.26)
 #' qx("male",c(0.03,0.01))
-#' \dontrun{qx("male",c(0.03,0.01),am=0.3)}
+#' \donttest{qx("male",c(0.03,0.01),am=0.3)}
 #' @importFrom stats predict
 #' @export
 qx <- function(sex,cm,smooth=TRUE,outlogit=FALSE,out5=TRUE,am=NULL,modsv=2024) {
