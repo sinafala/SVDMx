@@ -19,7 +19,6 @@
 #' qx("male",0.03,am=0.26)
 #' qx("male",0.03,TRUE,TRUE,TRUE,0.26)
 #' qx("male",c(0.03,0.01))
-#' \donttest{qx("male",c(0.03,0.01),am=0.3)}
 #' @importFrom stats predict
 #' @export
 qx <- function(sex,cm,smooth=TRUE,outlogit=FALSE,out5=TRUE,am=NULL,modsv=2024) {
