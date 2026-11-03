@@ -11,6 +11,8 @@
   (2019) and the results of earlier versions of the package.
 * The warning that a generated schedule departs from its inputs by more than 10% (0.2.1) now
   applies only with `match.inputs = FALSE`.
+* New function `plotqx()` plots the schedules returned by `qx()` on the natural or the logit
+  scale, and optionally saves the plot as a PNG or PDF file.
 
 # SVDMx 0.2.1 (not released on CRAN; included in 0.3.0)
 

@@ -159,3 +159,40 @@ test_that("matching changes the schedule only within the span of the components"
     expect_gt(max(abs(d)), 1e-3)
   }
 })
+
+test_that("plotqx() plots and returns the schedules on either scale", {
+  pdf(NULL)
+  on.exit(dev.off())
+  q5 <- qx("female", c(0.01, 0.1))
+  p <- plotqx(q5)
+  expect_equal(dim(p), c(24, 3))
+  expect_equal(p$age, c(0, 1, seq(5, 110, 5)))
+  expect_equal(unname(as.matrix(p[, -1])), unname(as.matrix(q5)))
+  p <- plotqx(q5, outlogit = TRUE)
+  expect_equal(dim(p), c(23, 3))
+  expect_equal(unname(as.matrix(p[, -1])), unname(logit(as.matrix(q5)[1:23, ])))
+  # single-year schedules, and schedules returned on the logit scale
+  q1 <- qx("male", 0.03, am = 0.26, out5 = FALSE)
+  expect_equal(nrow(plotqx(q1)), 110)
+  expect_equal(plotqx(qx("male", 0.03, am = 0.26, out5 = FALSE, outlogit = TRUE)), plotqx(q1),
+               tolerance = 1e-12)
+  expect_equal(plotqx(qx("female", 0.05, outlogit = TRUE), outlogit = TRUE),
+               plotqx(qx("female", 0.05), outlogit = TRUE), tolerance = 1e-12)
+})
+
+test_that("plotqx() saves PDF and PNG files", {
+  f <- file.path(tempdir(), "plotqx-test.pdf")
+  plotqx(qx("female", 0.05), file = f)
+  expect_true(file.exists(f) && file.size(f) > 0)
+  skip_if_not(capabilities("png"))
+  f <- file.path(tempdir(), "plotqx-test.png")
+  plotqx(qx("female", 0.05), outlogit = TRUE, file = f, width = 4, height = 3)
+  expect_true(file.exists(f) && file.size(f) > 0)
+})
+
+test_that("plotqx() checks its inputs", {
+  expect_error(plotqx(), "must be given")
+  expect_error(plotqx(qx("female", 0.05), file = "plot.jpg"), "png or .pdf")
+  expect_error(plotqx(qx("female", 0.05)[1:10, , drop = FALSE]), "110 single-year ages")
+  expect_error(plotqx(qx("female", 0.05), outlogit = "yes"), "TRUE or FALSE")
+})

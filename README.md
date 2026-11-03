@@ -11,6 +11,8 @@ qx("male", 0.03, am = 0.26)        # from 5q0 and 45q15
 qx("female", 0.05, out5 = FALSE)   # single-year 1qx
 qx("female", 0.05, modsv = 2018)   # the models in the Demography paper
 qx("female", 0.05, match.inputs = FALSE)  # the model exactly as published, see below
+plotqx(qx("female", c(0.005, 0.05, 0.2)))                       # plot 5qx
+plotqx(qx("male", 0.03, out5 = FALSE), outlogit = TRUE, file = "male.pdf")  # logit 1qx, saved
 ```
 
 By default `qx()` makes each generated schedule reproduce its inputs exactly: its 5q0 is the

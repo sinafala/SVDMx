@@ -2,6 +2,17 @@
 
 export(expit)
 export(logit)
+export(plotqx)
 export(q1to5)
 export(qx)
+importFrom(grDevices,
+  dev.off,
+  hcl,
+  pdf,
+  png
+)
+importFrom(graphics,
+  legend,
+  matplot
+)
 importFrom(stats,predict)
