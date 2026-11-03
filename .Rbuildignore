@@ -6,3 +6,4 @@
 ^SVDMx_.*\.tar\.gz$
 ^\.gitignore$
 ^\.gitattributes$
+^CRAN-SUBMISSION$
