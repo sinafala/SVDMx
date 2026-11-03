@@ -12,6 +12,8 @@
 #'
 #' \strong{q1to5} converts single-year 1qx to five-year 5qx.
 #'
+#' \strong{lifetable} makes complete life tables, abridged or single-year, from the same inputs as \code{qx()}; \strong{lifetableBatch} makes a batch of them from a file of inputs; and \strong{writeLifetables} writes them to Excel, CSV, fixed-column text or JSON files.
+#'
 #' @section Calibrations:
 #' The models are calibrated on successive versions of the Human Mortality Database: \code{mods2018} (the
 #'     models in the \emph{Demography} paper), \code{mods2021}, \code{mods2022}, \code{mods2024}, \code{mods2025},

@@ -13,6 +13,9 @@ qx("female", 0.05, modsv = 2018)   # the models in the Demography paper
 qx("female", 0.05, match.inputs = FALSE)  # the model exactly as published, see below
 plotqx(qx("female", c(0.005, 0.05, 0.2)))                       # plot 5qx
 plotqx(qx("male", 0.03, out5 = FALSE), outlogit = TRUE, file = "male.pdf")  # logit 1qx, saved
+lifetable("female", 0.05)                                       # abridged life table
+lifetable("male", 0.03, am = 0.26, out5 = FALSE, file = "male.xlsx")  # single-year, to Excel
+lifetableBatch("inputs.csv", file = c("lifetables.xlsx", "lifetables.json"))  # a batch from a file
 ```
 
 By default `qx()` makes each generated schedule reproduce its inputs exactly: its 5q0 is the

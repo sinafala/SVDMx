@@ -13,6 +13,17 @@
   applies only with `match.inputs = FALSE`.
 * New function `plotqx()` plots the schedules returned by `qx()` on the natural or the logit
   scale, and optionally saves the plot as a PNG or PDF file.
+* New function `lifetable()` makes complete life tables from the same inputs as `qx()`, abridged
+  (age groups 0, 1-4, 5-9, ..., 110+) or single-year (0, 1, ..., 110+). nax is the Coale-Demeny
+  rule at ages 0 and 1-4, 2.5 years in five-year age groups and 0.5 years in single years of
+  age; the open age group continues the death rate at age 109. Built from observed HMD 1qx, the
+  single-year tables reproduce the HMD's own e0 to within 0.02 years.
+* New function `lifetableBatch()` makes a batch of life tables from a CSV, text or Excel file
+  (or data frame) with one row per life table: sex, 5q0, optionally 45q15, settings, and any
+  label columns such as country and year.
+* New function `writeLifetables()` writes life tables to Excel (.xlsx), CSV, fixed-column text
+  (.txt) and JSON files; `lifetable()` and `lifetableBatch()` do the same with `file =`. Excel
+  and JSON need the suggested packages writexl and jsonlite, and Excel input needs readxl.
 
 # SVDMx 0.2.1 (not released on CRAN; included in 0.3.0)
 

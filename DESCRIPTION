@@ -12,8 +12,8 @@ Description: Model age schedules of mortality, nqx, suitable for a life table. T
 URL: https://github.com/sinafala/SVDMx, https://github.com/sinafala/svd-comp
 BugReports: https://github.com/sinafala/SVDMx/issues
 Depends: R (>= 3.5.0)
-Imports: graphics, grDevices, stats
-Suggests: testthat (>= 3.0.0)
+Imports: graphics, grDevices, stats, utils
+Suggests: jsonlite, readxl, testthat (>= 3.0.0), writexl
 Config/testthat/edition: 3
 Encoding: UTF-8
 License: GPL (>= 3)
