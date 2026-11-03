@@ -7,7 +7,7 @@
 q1to5(q1)
 }
 \arguments{
-\item{q1}{Decimal: the input values for 1qx; either a single vector or a matrix, age x life table.}
+\item{q1}{Decimal: the input values for 1qx, ages 0 to 109 (or older); either a single vector or a matrix or data frame, age x life table.}
 }
 \value{
 Data frame: equivalent values for 5qx.

@@ -3,7 +3,7 @@
 #' @description Convert 1-year life table probabilities of dying 1qx to standard five-year age groups: 0, 1-4, 5-9, etc.
 #' @author Samuel J. Clark, \email{work@samclark.net}
 #'
-#' @param q1 Decimal: the input values for 1qx; either a single vector or a matrix, age x life table.
+#' @param q1 Decimal: the input values for 1qx, ages 0 to 109 (or older); either a single vector or a matrix or data frame, age x life table.
 #' @return Data frame: equivalent values for 5qx.
 #' @examples
 #' q1 <- qx("female",0.08,out5=FALSE)
@@ -13,8 +13,12 @@ q1to5 <- function(q1) {
 
   if (missing(q1))
     stop('q1 does not have a value')
-  if (!nrow(q1) >= 109)
-    stop('q1 must have at least 109 single-year age groups')
+  # a single vector is treated as one life table
+  if (is.null(dim(q1))) {
+    q1 <- matrix(q1,ncol=1)
+  }
+  if (!nrow(q1) >= 110)
+    stop('q1 must have at least 110 single-year age groups, ages 0 to 109')
 
   # initialize matrix for five-year qs and vector for row names
   q5 <- matrix(data=0,ncol=ncol(q1),nrow=24)
@@ -48,7 +52,9 @@ q1to5 <- function(q1) {
 
   # label rows and columns
   rownames(q5) <- rNames
-  colnames(q5) <- colnames(q1)
+  if (!is.null(colnames(q1))) {
+    colnames(q5) <- colnames(q1)
+  }
 
   return(q5)
 

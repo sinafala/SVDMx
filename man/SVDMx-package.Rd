@@ -16,8 +16,29 @@ Clark (2019) \doi{doi:10.1007/s13524-019-00785-3}.
 \strong{qx} takes child or child/adult mortality and generates full age schedules of mortality.
 }
 
+\section{Calibrations}{
+
+The models are calibrated on successive versions of the Human Mortality Database: \code{mods2018} (the
+models in the \emph{Demography} paper), \code{mods2021}, \code{mods2022}, \code{mods2024}, \code{mods2025},
+and \code{mods2026} (the default). Choose one with the \code{modsv} argument of \code{qx()}.
+}
+
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/sinafala/SVDMx}
+  \item \url{https://github.com/sinafala/svd-comp}
+  \item Report bugs at \url{https://github.com/sinafala/SVDMx/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Samuel Clark \email{work@samclark.net} [copyright holder]
+
+Authors:
+\itemize{
+  \item Samuel Clark \email{work@samclark.net} [copyright holder]
+}
 
 }
 \keyword{internal}

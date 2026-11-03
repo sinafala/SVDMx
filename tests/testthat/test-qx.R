@@ -1,0 +1,81 @@
+# number of life tables (for each sex) each calibration was estimated from
+n.lts <- function(m) m$female$v1$df.residual + m$female$v1$rank
+
+test_that("every calibration version is available and distinct", {
+  versions <- c(2018, 2021, 2022, 2024, 2025, 2026)
+  out <- lapply(versions, function(v) qx("female", 0.05, modsv = v)[, 1])
+  for (i in 1:(length(versions) - 1)) {
+    for (j in (i + 1):length(versions)) {
+      expect_false(isTRUE(all.equal(out[[i]], out[[j]])),
+                   info = paste(versions[i], "vs", versions[j]))
+    }
+  }
+  # the default is the newest calibration
+  expect_identical(qx("female", 0.05), qx("female", 0.05, modsv = 2026))
+})
+
+test_that("each calibration has the documented number of life tables", {
+  expect_equal(n.lts(mods2018), 4610)  # the Demography paper
+  expect_equal(n.lts(mods2021), 4765)  # 'mods2018' in version 0.1.0
+  expect_equal(n.lts(mods2022), 4857)
+  expect_equal(n.lts(mods2024), 4902)
+  expect_equal(n.lts(mods2025), 4946)
+  expect_equal(n.lts(mods2026), 4987)
+})
+
+test_that("results for the 2022 and 2024 calibrations are unchanged from version 0.1.0", {
+  fx <- readRDS(test_path("fixtures", "qx-0.1.0.rds"))
+  for (k in seq_len(nrow(fx$grid))) {
+    g <- fx$grid[k, ]
+    am <- if (is.na(g$am)) NULL else g$am
+    new <- qx(g$sex, g$cm, smooth = g$smooth, outlogit = g$outlogit,
+              out5 = g$out5, am = am, modsv = g$modsv)
+    expect_equal(new, fx$ref[[k]], tolerance = 1e-12, info = paste("row", k))
+  }
+})
+
+test_that("qx() returns the expected shapes", {
+  expect_equal(dim(qx("female", 0.05)), c(24, 1))
+  expect_equal(dim(qx("female", 0.05, out5 = FALSE)), c(110, 1))
+  expect_equal(dim(qx("male", c(0.01, 0.05, 0.1))), c(24, 3))
+  expect_equal(dim(qx("male", 0.05, outlogit = TRUE)), c(23, 1))
+  expect_equal(qx("female", 0.05)["110+", 1], 1)
+  q <- qx("male", c(0.004, 0.3), out5 = FALSE)
+  expect_true(all(q > 0 & q < 1))
+})
+
+test_that("sex is not case sensitive", {
+  expect_identical(qx("Female", 0.05), qx("female", 0.05))
+  expect_identical(qx("MALE", 0.05), qx("male", 0.05))
+})
+
+test_that("bad inputs give clear errors", {
+  expect_error(qx("female"), "must both be given")
+  expect_error(qx("women", 0.05), "female")
+  expect_error(qx(c("female", "male"), 0.05), "female")
+  expect_error(qx("female", NA_real_), "not missing")
+  expect_error(qx("female", NA), "number")
+  expect_error(qx("female", 0.002), "between 0.003 and 0.3")
+  expect_error(qx("female", 0.5), "between 0.003 and 0.3")
+  expect_error(qx("female", "0.05"), "number")
+  expect_error(qx("female", 0.05, am = 1.5), "between 0 and 1")
+  expect_error(qx("female", 0.05, am = NA_real_), "not missing")
+  expect_error(qx("female", c(0.05, 0.06), am = 0.2), "same length")
+  expect_error(qx("female", 0.05, modsv = 2019), "must be one of")
+  expect_error(qx("female", 0.05, modsv = NA), "must be one of")
+})
+
+test_that("am = NULL given explicitly means am is predicted", {
+  expect_identical(qx("female", 0.05, am = NULL), qx("female", 0.05))
+})
+
+test_that("q1to5() accepts a vector, a matrix, or a data frame", {
+  q1 <- qx("female", c(0.02, 0.08), out5 = FALSE)
+  from.df <- q1to5(q1)
+  from.vector <- q1to5(q1[, 1])
+  from.matrix <- q1to5(as.matrix(q1))
+  expect_equal(unname(as.matrix(from.vector)[, 1]), unname(as.matrix(from.df)[, 1]))
+  expect_equal(from.matrix, from.df)
+  expect_equal(nrow(from.df), 24)
+  expect_error(q1to5(q1[1:100, ]), "at least 110")
+})

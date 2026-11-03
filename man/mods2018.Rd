@@ -7,10 +7,10 @@
 \format{
 An R list object with members:
 \describe{
-\item{\strong{Female}:}{
+\item{\strong{female}:}{
 \describe{
-\item{\strong{comps}: 4 raw SVD-derived components}{}
-\item{\strong{comps.sm}: 4 smoothed SVD-derived components}{}
+\item{\strong{components}: 4 raw SVD-derived components}{}
+\item{\strong{components.sm}: 4 smoothed SVD-derived components}{}
 \item{\strong{aml}: lm() model object for adult mortality model}{}
 \item{\strong{v1}: lm() model object for v1}{}
 \item{\strong{v2}: lm() model object for v2}{}
@@ -21,10 +21,10 @@ An R list object with members:
 \item{\strong{rownames}: row labels for the predicted values}{}
 }
 }
-\item{\strong{Male}:}{
+\item{\strong{male}:}{
 \describe{
-\item{\strong{comps}: 4 raw SVD-derived components}{}
-\item{\strong{comps.sm}: 4 smoothed SVD-derived components}{}
+\item{\strong{components}: 4 raw SVD-derived components}{}
+\item{\strong{components.sm}: 4 smoothed SVD-derived components}{}
 \item{\strong{aml}: lm() model object for adult mortality model}{}
 \item{\strong{v1}: lm() model object for v1}{}
 \item{\strong{v2}: lm() model object for v2}{}
@@ -51,8 +51,10 @@ mortality model indexed by child/child-adult mortality implemented by
 the 'qx()' function.  The model objects
 have been 'cleaned' to remove large collections
 of data that are not necessary to perform predictions - this dramatically
-reduces their size. This is the 2018 version of the models that replicates
-the \emph{Demography} paper.
+reduces their size. This is the 2018 version of the models, estimated from 4,610 life tables for each sex in the
+Human Mortality Database as downloaded on November 2, 2018. These are the models in the
+\emph{Demography} paper. (In version 0.1.0 of this package the object called 'mods2018'
+was the 2021 version, now called 'mods2021'.)
 }
 \author{
 Samuel J. Clark, \email{work@samclark.net}

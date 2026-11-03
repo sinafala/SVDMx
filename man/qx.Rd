@@ -11,33 +11,33 @@ qx(
   outlogit = FALSE,
   out5 = TRUE,
   am = NULL,
-  modsv = 2024
+  modsv = 2026
 )
 }
 \arguments{
-\item{sex}{Character: 'female' or 'male'.}
+\item{sex}{Character: 'female' or 'male' (not case sensitive).}
 
-\item{cm}{Decimal: the input value(s) for 5q0; either a single value or a vector of values.}
+\item{cm}{Decimal: the input value(s) for 5q0, between 0.003 and 0.3; either a single value or a vector of values.}
 
 \item{smooth}{Boolean: use either smooth or raw SVD-derived components. Default is TRUE.}
 
-\item{outlogit}{Boolean: output either logit-scale or natural-scale nqx values. Default is FALSE. When TRUE oldest age not returned because logit(1) not defined.}
+\item{outlogit}{Boolean: output either logit-scale or natural-scale nqx values. Default is FALSE. When TRUE the oldest age group is not returned because logit(1) is not defined.}
 
 \item{out5}{Boolean: output either 5-year or 1-year age groups. Default is TRUE.}
 
-\item{am}{Optional decimal: input value(s) for 45q15; either single value or vector of values. If a vector, must have the same number of elements as cm.}
+\item{am}{Optional decimal: input value(s) for 45q15, between 0 and 1; either a single value or a vector of values. If a vector, must have the same number of elements as cm. If not given, 45q15 is predicted from 5q0.}
 
-\item{modsv}{Optional integer: specifies version of calibration models to use: 2018, 2022, or 2024. Defaults is 2024.}
+\item{modsv}{Optional integer: the version of the calibration models to use, named for the year of the Human Mortality Database (HMD) they were estimated from: 2018 (the models in the \emph{Demography} paper), 2021, 2022, 2024, 2025, or 2026. Default is 2026. See \code{\link{mods2026}} and the other \code{mods} data sets.}
 }
 \value{
-Data frame: generated 1qx or 5qx values. Oldest age assumed to be 1.0. Columns labeled with input child mortality values.
+Data frame: generated 1qx (ages 0 to 109) or 5qx (age groups 0, 1-4, 5-9, ..., 105-109, 110+) values. For 5-year output the oldest age group, 110+, is 1.0. Columns labeled with the input child and adult mortality values.
 }
 \description{
 Generate single-year 1qx or 5-year 5qx age-specific probabilities of dying using the SVD-Comp mortality model indexed by child mortality, 5q0, or child and adult mortality, 5q0 and 45q15.
 }
 \examples{
 qx("female",0.05)
-qx("female",0.05,modsv=2022)
+qx("female",0.05,modsv=2018)
 qx("male",0.03,am=0.26)
 qx("male",0.03,TRUE,TRUE,TRUE,0.26)
 qx("male",c(0.03,0.01))

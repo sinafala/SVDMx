@@ -1,16 +1,21 @@
 Package: SVDMx
 Title: Child/Child-Adult Mortality-Indexed Model Mortality Age Schedules
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person("Samuel", "Clark", , "work@samclark.net", role = c("aut", "cre", "cph"))
 Description: Model age schedules of mortality, nqx, suitable for a life table. This package 
     implements the SVD-Comp mortality model indexed by either child or child/adult mortality. 
     Given input value(s) of either 5q0 or (5q0, 45q15), the qx() function generates 
     single-year 1qx or 5-year 5qx conditional age-specific probabilities of dying. 
+    Calibrations from successive versions of the Human Mortality Database are included. 
     See Clark (2016) <doi:10.48550/arXiv.1612.01408> and Clark (2019) <doi:10.1007/s13524-019-00785-3>. 
+URL: https://github.com/sinafala/SVDMx, https://github.com/sinafala/svd-comp
+BugReports: https://github.com/sinafala/SVDMx/issues
+Depends: R (>= 3.5.0)
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
 Encoding: UTF-8
 License: GPL (>= 3)
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-
+Config/roxygen2/version: 8.1.1
