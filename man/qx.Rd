@@ -11,7 +11,8 @@ qx(
   outlogit = FALSE,
   out5 = TRUE,
   am = NULL,
-  modsv = 2026
+  modsv = 2026,
+  match.inputs = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ qx(
 \item{am}{Optional decimal: input value(s) for 45q15; either a single value or a vector of values. If a vector, must have the same number of elements as cm. Must lie within the range of 45q15 in the life tables the selected calibration was estimated from (see Details). If not given, 45q15 is predicted from 5q0.}
 
 \item{modsv}{Optional integer: the version of the calibration models to use, named for the year of the Human Mortality Database (HMD) they were estimated from: 2018 (the models in the \emph{Demography} paper), 2021, 2022, 2024, 2025, or 2026. Default is 2026. See \code{\link{mods2026}} and the other \code{mods} data sets.}
+
+\item{match.inputs}{Boolean: make each generated schedule reproduce its inputs exactly, so that its 5q0 equals cm and, when am is given, its 45q15 equals am. Default is TRUE. This is an addition to the model in Clark (2019); FALSE gives the model as published and the results of SVDMx 0.2.1 and earlier (see Details).}
 }
 \value{
 Data frame: generated 1qx (ages 0 to 109) or 5qx (age groups 0, 1-4, 5-9, ..., 105-109, 110+) values. For 5-year output the oldest age group, 110+, is 1.0. Each column is labeled with its input value of 5q0 and with the input value of 45q15 or, when am is not given, the value predicted from 5q0 (not the 45q15 of the generated schedule). The labels have three decimal places, more for values below 0.001 or when needed to keep the labels of different inputs distinct.
@@ -54,9 +57,31 @@ Human Mortality Database life tables used to estimate the selected calibration:\
 The data behind the 2021 calibration are no longer available; its ranges are those
 spanned by the 2018 and 2022 data.
 
-\strong{Agreement with the inputs.} SVD-Comp predicts the whole age schedule from 5q0 (and
-45q15), but it does not force the generated schedule to reproduce the input values
-exactly. For 5q0 between about 0.004 and 0.4 the 5q0 of the generated schedule is within
+\strong{Matching the inputs.} The SVD-Comp model in Clark (2019) predicts the whole age
+schedule from 5q0 (and 45q15), but it does not force the generated schedule to reproduce
+the input values exactly. By default (\code{match.inputs = TRUE}) \code{qx()} then changes each
+generated schedule as little as possible so that it does: its 5q0 equals \code{cm} and, when
+\code{am} is given, its 45q15 equals \code{am}. When \code{am} is not given, only 5q0 is matched. The
+change is a combination of one direction per input: the gradient of logit(5q0) or
+logit(45q15) with respect to the logit(1qx) schedule, projected onto the span of the four
+components. To first order it is therefore the smallest change of the logit(1qx) schedule
+that removes the differences; it is concentrated in each input's own ages as far as the
+components allow, and the corrected schedule is still a combination of the same four
+components. The coefficients of the directions solve the matching equations exactly by
+Newton's method, to within 1e-10 on the logit scale. The correction applies to the whole
+predicted schedule, including the separately predicted 1q0. \code{qx()} gives a warning if any
+schedule does not converge, which did not happen for any life table in the October 2026
+HMD with any calibration, or for any combination of inputs within the ranges above.
+
+For the life tables in the October 2026 HMD, with the 2026 calibration and the raw
+components, matching the inputs reduces the mean absolute error of e0 from 1.35 to 1.33
+years (females) and from 1.89 to 1.84 years (males) when only 5q0 is given, and from 0.65
+to 0.58 and from 0.66 to 0.54 years when both 5q0 and 45q15 are given. The mean error of
+e0 falls from 0.14--0.36 years to between -0.02 and 0.15 years. The errors in 1qx fall at
+ages 1--4 and 15--59 and rise slightly at age 0 and at ages 60 and older. These are
+in-sample comparisons: each life table was also used to estimate the models.
+
+\strong{Agreement with the inputs without matching.} With \code{match.inputs = FALSE}, for 5q0 between about 0.004 and 0.4 the 5q0 of the generated schedule is within
 about 9\% of the input. The difference grows toward the extremes: at the lowest observed
 levels of 5q0 (0.002--0.003) the generated 5q0 is about 8--21\% too low, depending on the
 calibration and sex, and above 5q0 = 0.4 it is increasingly too high. \code{qx()} gives a
@@ -71,6 +96,7 @@ qx("female",0.05,modsv=2018)
 qx("male",0.03,am=0.26)
 qx("male",0.03,TRUE,TRUE,TRUE,0.26)
 qx("male",c(0.03,0.01))
+qx("female",0.05,match.inputs=FALSE) # the model as published in Clark (2019)
 }
 \references{
 Clark (2016) \doi{doi:10.48550/arXiv.1612.01408} and Clark (2019) \doi{doi:10.1007/s13524-019-00785-3}

@@ -1,4 +1,18 @@
-# SVDMx 0.2.1
+# SVDMx 0.3.0
+
+* New argument `match.inputs` in `qx()`, `TRUE` by default: each generated schedule is changed
+  as little as possible, within the span of the model's components, so that it reproduces its
+  inputs exactly: its 5q0 equals `cm` and, when `am` is given, its 45q15 equals `am`. This is
+  an addition to the model in Clark (2019). For the life tables in the October 2026 HMD it
+  reduces the mean absolute error of e0, most of all when 45q15 is given (from 0.65 to 0.58
+  years for females and from 0.66 to 0.54 years for males), and it removes most of the bias
+  in e0. See `?qx`.
+* **Results change by default.** `match.inputs = FALSE` gives the model as published in Clark
+  (2019) and the results of earlier versions of the package.
+* The warning that a generated schedule departs from its inputs by more than 10% (0.2.1) now
+  applies only with `match.inputs = FALSE`.
+
+# SVDMx 0.2.1 (not released on CRAN; included in 0.3.0)
 
 * `qx()` accepts a much wider range of inputs. Versions 0.1.0 and 0.2.0 stopped for 5q0
   outside 0.003-0.3. `qx()` now accepts any 5q0, and 45q15 if given, within the range of

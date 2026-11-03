@@ -23,14 +23,15 @@ test_that("each calibration has the documented number of life tables", {
   expect_equal(n.lts(mods2026), 4987)
 })
 
-test_that("results for the 2022 and 2024 calibrations are unchanged from version 0.1.0", {
+test_that("with match.inputs = FALSE, results for 2022 and 2024 are unchanged from 0.1.0", {
   fx <- readRDS(test_path("fixtures", "qx-0.1.0.rds"))
   for (k in seq_len(nrow(fx$grid))) {
     g <- fx$grid[k, ]
     am <- if (is.na(g$am)) NULL else g$am
     # (some of these input combinations now also give an agreement warning)
     new <- suppressWarnings(qx(g$sex, g$cm, smooth = g$smooth, outlogit = g$outlogit,
-                               out5 = g$out5, am = am, modsv = g$modsv))
+                               out5 = g$out5, am = am, modsv = g$modsv,
+                               match.inputs = FALSE))
     expect_equal(new, fx$ref[[k]], tolerance = 1e-12, info = paste("row", k))
   }
 })
@@ -63,6 +64,8 @@ test_that("bad inputs give clear errors", {
   expect_error(qx("female", c(0.05, 0.06), am = 0.2), "same length")
   expect_error(qx("female", 0.05, modsv = 2019), "must be one of")
   expect_error(qx("female", 0.05, modsv = NA), "must be one of")
+  expect_error(qx("female", 0.05, match.inputs = NA), "TRUE or FALSE")
+  expect_error(qx("female", 0.05, match.inputs = "yes"), "TRUE or FALSE")
 })
 
 test_that("am = NULL given explicitly means am is predicted", {
@@ -99,11 +102,13 @@ test_that("inputs are limited to the range of the calibration life tables", {
   expect_error(qx("female", 1.2), "must be between")
 })
 
-test_that("a warning is given when a generated schedule does not reproduce its input", {
-  expect_no_warning(qx("male", c(0.005, 0.01, 0.05, 0.1, 0.2, 0.3)))
-  expect_no_warning(qx("female", c(0.005, 0.01, 0.05, 0.1, 0.2, 0.3), smooth = FALSE))
-  expect_warning(qx("male", 0.002), "differs from the input")
-  expect_warning(qx("male", 0.55), "differs from the input")
+test_that("without matching, a warning is given when a schedule departs from its input", {
+  expect_no_warning(qx("male", c(0.005, 0.01, 0.05, 0.1, 0.2, 0.3), match.inputs = FALSE))
+  expect_no_warning(qx("female", c(0.005, 0.01, 0.05, 0.1, 0.2, 0.3), smooth = FALSE,
+                       match.inputs = FALSE))
+  expect_warning(qx("male", 0.002, match.inputs = FALSE), "differs from the input")
+  expect_warning(qx("male", 0.55, match.inputs = FALSE), "differs from the input")
+  expect_no_warning(qx("male", c(0.002, 0.55)))
 })
 
 test_that("column labels are distinct and keep the 0.1.0 format", {
@@ -112,4 +117,45 @@ test_that("column labels are distinct and keep the 0.1.0 format", {
   expect_false(anyDuplicated(labels) > 0)
   expect_match(labels[1], "^cm-0\\.0301\\.")
   expect_match(colnames(suppressWarnings(qx("female", 0.0005))), "^cm-0\\.00050\\.")
+})
+
+implied <- function(q, ages) 1 - apply(1 - as.matrix(q)[ages + 1, , drop = FALSE], 2, prod)
+
+test_that("by default the generated schedules reproduce their inputs exactly", {
+  cm <- c(0.0005, 0.002, 0.01, 0.05, 0.2, 0.5)
+  for (sm in c(TRUE, FALSE)) {
+    q <- qx("female", cm, smooth = sm, out5 = FALSE)
+    expect_equal(unname(implied(q, 0:4)), cm, tolerance = 1e-9)
+    am <- c(0.06, 0.08, 0.12, 0.2, 0.4, 0.7)
+    q <- qx("male", c(0.002, 0.005, 0.01, 0.05, 0.2, 0.5), am = am, smooth = sm, out5 = FALSE)
+    expect_equal(unname(implied(q, 0:4)), c(0.002, 0.005, 0.01, 0.05, 0.2, 0.5), tolerance = 1e-9)
+    expect_equal(unname(implied(q, 15:59)), am, tolerance = 1e-9)
+  }
+  # in the five-year output, 1q0 and 4q1 combine to the input 5q0
+  q5 <- as.matrix(qx("female", c(0.03, 0.1)))
+  expect_equal(unname(1 - (1 - q5[1, ]) * (1 - q5[2, ])), c(0.03, 0.1), tolerance = 1e-9)
+})
+
+test_that("matching converges at the corners of the input ranges", {
+  r <- SVDMx:::calibrationRanges
+  for (k in which(r$modsv == 2026)) {
+    cm <- rep(c(r$cm.min[k], r$cm.max[k]), 2)
+    am <- rep(c(r$am.min[k], r$am.max[k]), each = 2)
+    expect_no_warning(q <- qx(r$sex[k], cm, am = am, out5 = FALSE))
+    expect_equal(unname(implied(q, 0:4)), cm, tolerance = 1e-9)
+    expect_equal(unname(implied(q, 15:59)), am, tolerance = 1e-9)
+  }
+})
+
+test_that("matching changes the schedule only within the span of the components", {
+  m <- mods2026$female
+  for (sm in c(FALSE, TRUE)) {
+    cs <- if (sm) m$components.sm else m$components
+    d <- logit(as.matrix(qx("female", c(0.002, 0.05), smooth = sm, out5 = FALSE))) -
+      logit(as.matrix(suppressWarnings(qx("female", c(0.002, 0.05), smooth = sm, out5 = FALSE,
+                                          match.inputs = FALSE))))
+    resid <- d - t(cs[1:4, ]) %*% qr.solve(t(cs[1:4, ]), d)
+    expect_lt(max(abs(resid)), 1e-8)
+    expect_gt(max(abs(d)), 1e-3)
+  }
 })
