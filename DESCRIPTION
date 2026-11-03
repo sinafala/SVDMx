@@ -1,6 +1,6 @@
 Package: SVDMx
 Title: Child/Child-Adult Mortality-Indexed Model Mortality Age Schedules
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: 
     person("Samuel", "Clark", , "work@samclark.net", role = c("aut", "cre", "cph"))
 Description: Model age schedules of mortality, nqx, suitable for a life table. This package 

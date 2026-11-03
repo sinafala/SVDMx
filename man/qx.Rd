@@ -17,23 +17,53 @@ qx(
 \arguments{
 \item{sex}{Character: 'female' or 'male' (not case sensitive).}
 
-\item{cm}{Decimal: the input value(s) for 5q0, between 0.003 and 0.3; either a single value or a vector of values.}
+\item{cm}{Decimal: the input value(s) for 5q0; either a single value or a vector of values. Must lie within the range of 5q0 in the life tables the selected calibration was estimated from (see Details).}
 
-\item{smooth}{Boolean: use either smooth or raw SVD-derived components. Default is TRUE.}
+\item{smooth}{Boolean: use either smooth or raw SVD-derived components. Default is TRUE. The validation results in Clark (2019) use the raw components (FALSE).}
 
-\item{outlogit}{Boolean: output either logit-scale or natural-scale nqx values. Default is FALSE. When TRUE the oldest age group is not returned because logit(1) is not defined.}
+\item{outlogit}{Boolean: output either logit-scale or natural-scale nqx values. Default is FALSE. With 5-year output (out5 = TRUE) the open age group 110+ is not returned on the logit scale because logit(1) is not defined.}
 
 \item{out5}{Boolean: output either 5-year or 1-year age groups. Default is TRUE.}
 
-\item{am}{Optional decimal: input value(s) for 45q15, between 0 and 1; either a single value or a vector of values. If a vector, must have the same number of elements as cm. If not given, 45q15 is predicted from 5q0.}
+\item{am}{Optional decimal: input value(s) for 45q15; either a single value or a vector of values. If a vector, must have the same number of elements as cm. Must lie within the range of 45q15 in the life tables the selected calibration was estimated from (see Details). If not given, 45q15 is predicted from 5q0.}
 
 \item{modsv}{Optional integer: the version of the calibration models to use, named for the year of the Human Mortality Database (HMD) they were estimated from: 2018 (the models in the \emph{Demography} paper), 2021, 2022, 2024, 2025, or 2026. Default is 2026. See \code{\link{mods2026}} and the other \code{mods} data sets.}
 }
 \value{
-Data frame: generated 1qx (ages 0 to 109) or 5qx (age groups 0, 1-4, 5-9, ..., 105-109, 110+) values. For 5-year output the oldest age group, 110+, is 1.0. Columns labeled with the input child and adult mortality values.
+Data frame: generated 1qx (ages 0 to 109) or 5qx (age groups 0, 1-4, 5-9, ..., 105-109, 110+) values. For 5-year output the oldest age group, 110+, is 1.0. Each column is labeled with its input value of 5q0 and with the input value of 45q15 or, when am is not given, the value predicted from 5q0 (not the 45q15 of the generated schedule). The labels have three decimal places, more for values below 0.001 or when needed to keep the labels of different inputs distinct.
 }
 \description{
 Generate single-year 1qx or 5-year 5qx age-specific probabilities of dying using the SVD-Comp mortality model indexed by child mortality, 5q0, or child and adult mortality, 5q0 and 45q15.
+}
+\details{
+\strong{Range of the inputs.} \code{qx()} does not extrapolate beyond the life tables the models were
+estimated from: \code{cm}, and \code{am} if given, must lie within the range of 5q0 and 45q15 in the
+Human Mortality Database life tables used to estimate the selected calibration:\tabular{llll}{
+   \code{modsv} \tab sex \tab 5q0 \tab 45q15 \cr
+   2018 \tab female \tab 0.0008728 -- 0.5903 \tab 0.03438 -- 0.7842 \cr
+   2018 \tab male \tab 0.001332 -- 0.6087 \tab 0.05821 -- 0.8649 \cr
+   2021, 2022 \tab female \tab 0.0004839 -- 0.5903 \tab 0.03221 -- 0.7842 \cr
+   2021, 2022 \tab male \tab 0.001332 -- 0.6087 \tab 0.05463 -- 0.8649 \cr
+   2024 \tab female \tab 0.0004839 -- 0.5903 \tab 0.03221 -- 0.7842 \cr
+   2024 \tab male \tab 0.001342 -- 0.6087 \tab 0.05463 -- 0.8649 \cr
+   2025, 2026 \tab female \tab 0.0004839 -- 0.5903 \tab 0.03074 -- 0.7842 \cr
+   2025, 2026 \tab male \tab 0.001342 -- 0.6087 \tab 0.05185 -- 0.8649 \cr
+}
+
+
+The data behind the 2021 calibration are no longer available; its ranges are those
+spanned by the 2018 and 2022 data.
+
+\strong{Agreement with the inputs.} SVD-Comp predicts the whole age schedule from 5q0 (and
+45q15), but it does not force the generated schedule to reproduce the input values
+exactly. For 5q0 between about 0.004 and 0.4 the 5q0 of the generated schedule is within
+about 9\% of the input. The difference grows toward the extremes: at the lowest observed
+levels of 5q0 (0.002--0.003) the generated 5q0 is about 8--21\% too low, depending on the
+calibration and sex, and above 5q0 = 0.4 it is increasingly too high. \code{qx()} gives a
+warning when the 5q0 of a generated schedule, or its 45q15 when \code{am} is given, differs
+from the input by more than 10\%. For the life tables in the October 2026 HMD, that happens
+for about 2\% of the tables when only 5q0 is given, and for about 4--7\% when both 5q0 and
+45q15 are given.
 }
 \examples{
 qx("female",0.05)

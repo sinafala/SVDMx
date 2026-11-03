@@ -1,3 +1,22 @@
+# SVDMx 0.2.1
+
+* `qx()` accepts a much wider range of inputs. Versions 0.1.0 and 0.2.0 stopped for 5q0
+  outside 0.003-0.3. `qx()` now accepts any 5q0, and 45q15 if given, within the range of
+  the life tables the selected calibration was estimated from: for example, 5q0 from 0.00048
+  to 0.59 for females with the 2026 calibration. This covers the lowest levels of child
+  mortality in the Human Mortality Database today. Inputs outside that range are still an
+  error, because the models do not extrapolate well. See `?qx` for the ranges.
+* `qx()` now warns when the 5q0 of a generated schedule, or its 45q15 when `am` is given,
+  differs from the input by more than 10%. SVD-Comp does not force a generated schedule to
+  reproduce its inputs exactly. The difference is small for 5q0 between about 0.004 and 0.4,
+  and it grows toward the extremes.
+* Fixed: different inputs that round to the same three decimal places, such as 5q0 = 0.0301
+  and 0.0304, gave output columns with the same label. Labels now use more decimal places
+  when needed; labels for all other inputs are unchanged.
+* Documentation: the input ranges for each calibration, how close the generated schedules
+  are to their inputs, what the column labels show, `outlogit`, and the `smooth` setting
+  used in Clark (2019).
+
 # SVDMx 0.2.0
 
 * New calibration of the models from the October 29, 2026 version of the Human Mortality

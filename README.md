@@ -12,6 +12,10 @@ qx("female", 0.05, out5 = FALSE)   # single-year 1qx
 qx("female", 0.05, modsv = 2018)   # the models in the Demography paper
 ```
 
+`qx()` accepts 5q0 (and 45q15) within the range of the life tables each calibration was
+estimated from, and warns if a generated schedule does not reproduce its inputs closely;
+see `?qx`.
+
 The models are calibrated on the Human Mortality Database (HMD). Each calibration is
 included and named for the HMD version it was estimated from: `mods2018` (the
 *Demography* paper), `mods2021`, `mods2022`, `mods2024`, `mods2025`, and `mods2026`

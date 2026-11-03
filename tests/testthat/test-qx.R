@@ -28,8 +28,9 @@ test_that("results for the 2022 and 2024 calibrations are unchanged from version
   for (k in seq_len(nrow(fx$grid))) {
     g <- fx$grid[k, ]
     am <- if (is.na(g$am)) NULL else g$am
-    new <- qx(g$sex, g$cm, smooth = g$smooth, outlogit = g$outlogit,
-              out5 = g$out5, am = am, modsv = g$modsv)
+    # (some of these input combinations now also give an agreement warning)
+    new <- suppressWarnings(qx(g$sex, g$cm, smooth = g$smooth, outlogit = g$outlogit,
+                               out5 = g$out5, am = am, modsv = g$modsv))
     expect_equal(new, fx$ref[[k]], tolerance = 1e-12, info = paste("row", k))
   }
 })
@@ -42,6 +43,7 @@ test_that("qx() returns the expected shapes", {
   expect_equal(qx("female", 0.05)["110+", 1], 1)
   q <- qx("male", c(0.004, 0.3), out5 = FALSE)
   expect_true(all(q > 0 & q < 1))
+  expect_equal(nrow(qx("female", 0.05, outlogit = TRUE, out5 = FALSE)), 110)
 })
 
 test_that("sex is not case sensitive", {
@@ -53,13 +55,11 @@ test_that("bad inputs give clear errors", {
   expect_error(qx("female"), "must both be given")
   expect_error(qx("women", 0.05), "female")
   expect_error(qx(c("female", "male"), 0.05), "female")
-  expect_error(qx("female", NA_real_), "not missing")
+  expect_error(qx("female", NA_real_), "missing")
   expect_error(qx("female", NA), "number")
-  expect_error(qx("female", 0.002), "between 0.003 and 0.3")
-  expect_error(qx("female", 0.5), "between 0.003 and 0.3")
   expect_error(qx("female", "0.05"), "number")
-  expect_error(qx("female", 0.05, am = 1.5), "between 0 and 1")
-  expect_error(qx("female", 0.05, am = NA_real_), "not missing")
+  expect_error(qx("female", 0.05, am = 1.5), "between")
+  expect_error(qx("female", 0.05, am = NA_real_), "missing")
   expect_error(qx("female", c(0.05, 0.06), am = 0.2), "same length")
   expect_error(qx("female", 0.05, modsv = 2019), "must be one of")
   expect_error(qx("female", 0.05, modsv = NA), "must be one of")
@@ -78,4 +78,38 @@ test_that("q1to5() accepts a vector, a matrix, or a data frame", {
   expect_equal(from.matrix, from.df)
   expect_equal(nrow(from.df), 24)
   expect_error(q1to5(q1[1:100, ]), "at least 110")
+})
+
+test_that("inputs are limited to the range of the calibration life tables", {
+  r <- SVDMx:::calibrationRanges
+  expect_equal(nrow(r), 12)
+  expect_true(all(r$cm.min < r$cm.max & r$am.min < r$am.max))
+  # each version and sex accepts its own limits and rejects values just outside them
+  for (k in seq_len(nrow(r))) {
+    expect_error(suppressWarnings(qx(r$sex[k], r$cm.min[k], modsv = r$modsv[k])), NA)
+    expect_error(suppressWarnings(qx(r$sex[k], r$cm.max[k], modsv = r$modsv[k])), NA)
+    expect_error(qx(r$sex[k], r$cm.min[k] * 0.99, modsv = r$modsv[k]), "must be between")
+    expect_error(qx(r$sex[k], r$cm.max[k] * 1.01, modsv = r$modsv[k]), "must be between")
+    expect_error(qx(r$sex[k], 0.05, am = r$am.max[k] * 1.01, modsv = r$modsv[k]), "must be between")
+  }
+  # current low-mortality levels are now covered (0.1.0 and 0.2.0 stopped below 5q0 = 0.003)
+  expect_equal(dim(suppressWarnings(qx("female", 0.0025))), c(24, 1))
+  expect_error(qx("female", 0.0001), "must be between")
+  expect_error(qx("male", 0.001), "must be between")
+  expect_error(qx("female", 1.2), "must be between")
+})
+
+test_that("a warning is given when a generated schedule does not reproduce its input", {
+  expect_no_warning(qx("male", c(0.005, 0.01, 0.05, 0.1, 0.2, 0.3)))
+  expect_no_warning(qx("female", c(0.005, 0.01, 0.05, 0.1, 0.2, 0.3), smooth = FALSE))
+  expect_warning(qx("male", 0.002), "differs from the input")
+  expect_warning(qx("male", 0.55), "differs from the input")
+})
+
+test_that("column labels are distinct and keep the 0.1.0 format", {
+  expect_match(colnames(qx("female", 0.05)), "^cm-0\\.050\\.am-0\\.[0-9]{3}$")
+  labels <- colnames(qx("female", c(0.0301, 0.0304)))
+  expect_false(anyDuplicated(labels) > 0)
+  expect_match(labels[1], "^cm-0\\.0301\\.")
+  expect_match(colnames(suppressWarnings(qx("female", 0.0005))), "^cm-0\\.00050\\.")
 })
