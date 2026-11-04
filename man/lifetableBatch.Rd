@@ -15,7 +15,7 @@ lifetableBatch(
 )
 }
 \arguments{
-\item{input}{A data frame, or the name of a file ending in .csv, .txt (columns separated by tabs or spaces, with a header line) or .xlsx (the first sheet; needs the \pkg{readxl} package), with one row for each life table and these columns (names not case sensitive):
+\item{input}{A data frame, or the name of a file ending in .csv, .txt (columns separated by tabs or spaces, with a header line) or .xlsx (the first sheet), with one row for each life table and these columns (names not case sensitive):
 \itemize{
 \item sex (required): female or male (or f, m);
 \item cm (required): 5q0, also accepted under the names 5q0 or q5;

@@ -89,7 +89,7 @@ test_that("life tables print in fixed columns", {
   expect_equal(length(unique(nchar(rows))), 1)
 })
 
-test_that("writeLifetables() writes CSV and text, and Excel and JSON when available", {
+test_that("writeLifetables() writes CSV, text, JSON and Excel files", {
   lt <- lifetable("male", c(0.02, 0.08), am = c(0.15, 0.3))
   d <- tempfile("lt")
   dir.create(d)
@@ -100,13 +100,10 @@ test_that("writeLifetables() writes CSV and text, and Excel and JSON when availa
   expect_equal(csv$ex, as.data.frame(lt)$ex)
   txt <- readLines(f[2])
   expect_equal(sum(grepl("^Life table", txt)), 2)
-  skip_if_not_installed("jsonlite")
   writeLifetables(lt, file.path(d, "lt.json"))
   j <- jsonlite::read_json(file.path(d, "lt.json"), simplifyVector = TRUE)
   expect_equal(j$summary$e0, lt$summary$e0)
   expect_equal(j$lifetable[[2]]$lx, lt$tables[[2]]$lx)
-  skip_if_not_installed("writexl")
-  skip_if_not_installed("readxl")
   writeLifetables(lt, file.path(d, "lt.xlsx"))
   expect_equal(readxl::excel_sheets(file.path(d, "lt.xlsx")), c("summary", names(lt$tables)))
   x <- as.data.frame(readxl::read_excel(file.path(d, "lt.xlsx"), sheet = 2))

@@ -11,10 +11,10 @@ writeLifetables(x, file)
 
 \item{file}{Character: one or more file names, each ending in
 \itemize{
-\item .xlsx: an Excel workbook with a 'summary' sheet and one sheet for each life table (needs the \pkg{writexl} package);
+\item .xlsx: an Excel workbook with a 'summary' sheet and one sheet for each life table;
 \item .csv: all the life tables in one table, each row carrying the summary of its life table;
 \item .txt: fixed-column text, each life table under a heading that describes it, as printed;
-\item .json: an array with one object for each life table, holding its summary and its rows (needs the \pkg{jsonlite} package).
+\item .json: an array with one object for each life table, holding its summary and its rows.
 }
 
 The Excel, CSV and JSON files hold the values at full precision; the text file rounds them for reading: nmx and nqx to 6 decimal places, nax to 3, lx, ndx, nLx and Tx to whole numbers, and ex to 2.}
@@ -27,7 +27,8 @@ Write life tables made by \code{\link{lifetable}} or \code{\link{lifetableBatch}
 }
 \examples{
 lt <- lifetable("female",c(0.02,0.1))
-writeLifetables(lt,file.path(tempdir(),c("lifetables.csv","lifetables.txt")))
+files <- file.path(tempdir(),paste("lifetables",c("xlsx","csv","txt","json"),sep="."))
+writeLifetables(lt,files)
 }
 \author{
 Samuel J. Clark, \email{work@samclark.net}

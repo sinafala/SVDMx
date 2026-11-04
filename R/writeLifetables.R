@@ -5,16 +5,19 @@
 #'
 #' @param x An object of class \code{lifetables}, from \code{lifetable()} or \code{lifetableBatch()}.
 #' @param file Character: one or more file names, each ending in
-#' * .xlsx: an Excel workbook with a 'summary' sheet and one sheet for each life table (needs the \pkg{writexl} package);
+#' * .xlsx: an Excel workbook with a 'summary' sheet and one sheet for each life table;
 #' * .csv: all the life tables in one table, each row carrying the summary of its life table;
 #' * .txt: fixed-column text, each life table under a heading that describes it, as printed;
-#' * .json: an array with one object for each life table, holding its summary and its rows (needs the \pkg{jsonlite} package).
+#' * .json: an array with one object for each life table, holding its summary and its rows.
 #'
 #' The Excel, CSV and JSON files hold the values at full precision; the text file rounds them for reading: nmx and nqx to 6 decimal places, nax to 3, lx, ndx, nLx and Tx to whole numbers, and ex to 2.
 #' @return The file names, invisibly.
 #' @examples
 #' lt <- lifetable("female",c(0.02,0.1))
-#' writeLifetables(lt,file.path(tempdir(),c("lifetables.csv","lifetables.txt")))
+#' files <- file.path(tempdir(),paste("lifetables",c("xlsx","csv","txt","json"),sep="."))
+#' writeLifetables(lt,files)
+#' @importFrom writexl write_xlsx
+#' @importFrom jsonlite write_json
 #' @export
 writeLifetables <- function(x,file) {
 
@@ -26,10 +29,6 @@ writeLifetables <- function(x,file) {
   bad <- !(ext %in% c("xlsx","csv","txt","json")) | !grepl("\\.",file)
   if (any(bad))
     stop(paste('<file> must end in .xlsx, .csv, .txt or .json:',paste(file[bad],collapse=", ")))
-  if (any(ext == "xlsx") && !requireNamespace("writexl",quietly=TRUE))
-    stop('writing Excel files needs the writexl package: install.packages("writexl")')
-  if (any(ext == "json") && !requireNamespace("jsonlite",quietly=TRUE))
-    stop('writing JSON files needs the jsonlite package: install.packages("jsonlite")')
 
   for (i in seq_along(file)) {
     if (ext[i] == "csv") {
