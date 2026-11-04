@@ -21,6 +21,5 @@ importFrom(graphics,
   matplot
 )
 importFrom(jsonlite,write_json)
-importFrom(readxl,read_excel)
 importFrom(stats,predict)
 importFrom(writexl,write_xlsx)

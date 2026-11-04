@@ -3,7 +3,7 @@
 #' @description Read a file (or data frame) with one row for each life table wanted, giving its sex, 5q0 and optionally 45q15 and other settings, make all the life tables with \code{\link{lifetable}}, and optionally write them to Excel, CSV, fixed-column text or JSON files.
 #' @author Samuel J. Clark, \email{work@samclark.net}
 #'
-#' @param input A data frame, or the name of a file ending in .csv, .txt (columns separated by tabs or spaces, with a header line) or .xlsx (the first sheet), with one row for each life table and these columns (names not case sensitive):
+#' @param input A data frame, or the name of a file ending in .csv, .txt (columns separated by tabs or spaces, with a header line) or .xlsx (the first sheet; reading Excel files needs the \pkg{readxl} package), with one row for each life table and these columns (names not case sensitive):
 #' * sex (required): female or male (or f, m);
 #' * cm (required): 5q0, also accepted under the names 5q0 or q5;
 #' * am (optional): 45q15, also accepted under the names 45q15 or q45; leave it empty (or NA) to predict 45q15 from 5q0;
@@ -26,7 +26,6 @@
 #' write.csv(batch,f,row.names=FALSE)
 #' lifetableBatch(f,file=file.path(tempdir(),c("batch-lifetables.csv","batch-lifetables.txt")))
 #' @seealso \code{\link{lifetable}}, \code{\link{writeLifetables}}.
-#' @importFrom readxl read_excel
 #' @export
 lifetableBatch <- function(input,file=NULL,smooth=TRUE,out5=TRUE,modsv=2026,match.inputs=TRUE,radix=100000) {
 
@@ -147,6 +146,9 @@ readBatchInput <- function(input) {
     sep <- if (grepl("\t",first)) "\t" else ""
     inp <- utils::read.table(input,header=TRUE,sep=sep,stringsAsFactors=FALSE,check.names=FALSE,strip.white=TRUE)
   } else if (ext == "xlsx") {
+    # readxl is optional: only Excel input needs it
+    if (!requireNamespace("readxl",quietly=TRUE))
+      stop('reading Excel files needs the readxl package: install.packages("readxl")')
     inp <- as.data.frame(readxl::read_excel(input),stringsAsFactors=FALSE)
   } else {
     stop('<input> file must end in .csv, .txt or .xlsx')

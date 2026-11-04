@@ -23,7 +23,8 @@
   label columns such as country and year.
 * New function `writeLifetables()` writes life tables to Excel (.xlsx), CSV, fixed-column text
   (.txt) and JSON files; `lifetable()` and `lifetableBatch()` do the same with `file =`. For
-  Excel and JSON files, SVDMx now imports the packages writexl, readxl and jsonlite.
+  Excel and JSON files, SVDMx now imports the packages writexl and jsonlite. Reading batch
+  input from Excel files needs the package readxl, which is optional.
 
 # SVDMx 0.2.1 (not released on CRAN; included in 0.3.0)
 

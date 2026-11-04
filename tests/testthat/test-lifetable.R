@@ -105,6 +105,8 @@ test_that("writeLifetables() writes CSV, text, JSON and Excel files", {
   expect_equal(j$summary$e0, lt$summary$e0)
   expect_equal(j$lifetable[[2]]$lx, lt$tables[[2]]$lx)
   writeLifetables(lt, file.path(d, "lt.xlsx"))
+  expect_true(file.exists(file.path(d, "lt.xlsx")))
+  skip_if_not_installed("readxl")
   expect_equal(readxl::excel_sheets(file.path(d, "lt.xlsx")), c("summary", names(lt$tables)))
   x <- as.data.frame(readxl::read_excel(file.path(d, "lt.xlsx"), sheet = 2))
   expect_equal(x$Tx, lt$tables[[1]]$Tx)
@@ -142,4 +144,12 @@ test_that("lifetableBatch() reports unusable rows and collects warnings", {
   expect_error(lifetableBatch(data.frame(id = c("a", "a"), sex = "female", cm = 0.05)), "distinct")
   expect_warning(lifetableBatch(data.frame(sex = "male", cm = 0.002, match.inputs = FALSE)),
                  "warning\\(s\\) for individual rows")
+})
+
+test_that("lifetableBatch() reads Excel input when readxl is installed", {
+  skip_if_not_installed("readxl")
+  inp <- data.frame(id = c("a", "b"), sex = c("female", "male"), cm = c(0.02, 0.05), am = c(0.1, NA))
+  f <- tempfile(fileext = ".xlsx")
+  writexl::write_xlsx(inp, f)
+  expect_equal(lifetableBatch(f)$tables, lifetableBatch(inp)$tables)
 })
